@@ -1,0 +1,3 @@
+GET http://localhost:3000/api/v1/accounts/26573811-eb20-4b98-9321-ce9018fa3b67 HTTP/1.1
+
+###
