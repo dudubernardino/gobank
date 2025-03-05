@@ -11,8 +11,8 @@ type Account struct {
 	TaxID         string    `json:"tax_id"`
 	Name          string    `json:"name"`
 	Email         string    `json:"email"`
-	MonthlyIncome *int64    `json:"monthly_income,omitempty"`
-	AnnualRevenue *int64    `json:"annual_revenue,omitempty"`
+	MonthlyIncome int64     `json:"monthly_income,omitempty"`
+	AnnualRevenue int64     `json:"annual_revenue,omitempty"`
 	Balance       int64     `json:"balance"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`

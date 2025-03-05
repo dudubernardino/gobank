@@ -1,10 +1,10 @@
-package accounts
+package account
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
+	"github.com/dudubernardino/gobank/internal/infra/jsonutils"
 	"github.com/dudubernardino/gobank/internal/infra/repositories"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -30,7 +30,6 @@ func HandleGetAccountById(pool *pgxpool.Pool) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(account)
+		_ = jsonutils.EncodeJson(w, r, http.StatusOK, account)
 	}
 }

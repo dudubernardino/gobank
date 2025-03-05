@@ -7,4 +7,5 @@ import (
 
 type AccountRepository interface {
 	FindById(id uuid.UUID) (entities.Account, error)
+	Create(account entities.Account) (uuid.UUID, error)
 }

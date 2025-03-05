@@ -7,6 +7,7 @@ import (
 	"github.com/dudubernardino/gobank/internal/domain/account/repositories"
 	"github.com/dudubernardino/gobank/internal/infra/store/pgstore"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -31,10 +32,32 @@ func (repository *AccountRepositoryPostgres) FindById(id uuid.UUID) (entities.Ac
 	}
 
 	return entities.Account{
-		ID:        account.ID,
-		Name:      account.Name,
-		TaxID:     account.TaxID,
-		Balance:   account.Balance,
-		CreatedAt: account.CreatedAt.Time,
+		ID:            account.ID,
+		Name:          account.Name,
+		Email:         account.Email,
+		TaxID:         account.TaxID,
+		Balance:       account.Balance,
+		MonthlyIncome: account.MonthlyIncome.Int64,
+		AnnualRevenue: account.AnnualRevenue.Int64,
+		CreatedAt:     account.CreatedAt.Time,
+		UpdatedAt:     account.UpdatedAt,
 	}, nil
+}
+
+func (repository *AccountRepositoryPostgres) Create(payload entities.Account) (uuid.UUID, error) {
+	ctx := context.Background()
+	id, err := repository.queries.CreateAccount(ctx, pgstore.CreateAccountParams{
+		Name:          payload.Name,
+		Email:         payload.Email,
+		TaxID:         payload.TaxID,
+		Balance:       payload.Balance,
+		MonthlyIncome: pgtype.Int8{Int64: payload.MonthlyIncome, Valid: true},
+		AnnualRevenue: pgtype.Int8{Int64: payload.AnnualRevenue, Valid: true},
+	})
+
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	return id, nil
 }
