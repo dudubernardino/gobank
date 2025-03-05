@@ -19,14 +19,14 @@ func HandleGetAccountById(pool *pgxpool.Pool) http.HandlerFunc {
 		rawAccountId := chi.URLParam(r, "account_id")
 		accountId, err := uuid.Parse(rawAccountId)
 		if err != nil {
-			http.Error(w, "Invalid ID format", http.StatusBadRequest)
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": "invalid ID format"})
 			return
 		}
 
 		account, err := getAccountByIdUseCase.Exec(usecases.GetAccountByIdUseCaseRequest{Id: accountId})
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			_ = jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{"error": "account not found"})
 			return
 		}
 

@@ -7,7 +7,7 @@ content-type: application/json
 {
     "tax_id": "74553007002",
     "name": "John Doe",
-    "email": "email+sufix@email.com",
+    "email": "email@email.com",
     "monthly_income": 1000000,
     "annual_revenue": 12000000,
     "balance": 1000000

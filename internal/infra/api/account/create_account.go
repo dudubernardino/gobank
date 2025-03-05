@@ -1,6 +1,7 @@
 package account
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
@@ -14,9 +15,16 @@ func HandleCreateAccount(pool *pgxpool.Pool) http.HandlerFunc {
 		accountRepository := repositories.NewAccountsRepository(pool)
 		createAccountUseCase := usecases.NewCreateAccountUseCase(accountRepository)
 
-		data, err := jsonutils.DecodeJson[usecases.CreateAccountdUseCaseRequest](r)
+		data, problems, err := jsonutils.DecodeJson[usecases.CreateAccountdUseCaseRequest](r)
 		if err != nil {
-			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, err)
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if problems != nil {
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{
+				"validation_errors": problems,
+			})
 			return
 		}
 
@@ -30,7 +38,8 @@ func HandleCreateAccount(pool *pgxpool.Pool) http.HandlerFunc {
 		})
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			slog.Error("error creating account", "error", err.Error())
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": "something went wrong trying to create the account"})
 			return
 		}
 

@@ -17,12 +17,12 @@ func NewCreateAccountUseCase(repository repositories.AccountRepository) CreateAc
 }
 
 type CreateAccountdUseCaseRequest struct {
-	TaxId         string `json:"tax_id"`
-	Name          string `json:"name"`
-	Email         string `json:"email"`
-	MonthlyIncome int64  `json:"monthly_income"`
-	AnnualRevenue int64  `json:"annual_revenue"`
-	Balance       int64  `json:"balance"`
+	TaxId         string `json:"tax_id" validate:"required"`
+	Name          string `json:"name" validate:"required"`
+	Email         string `json:"email" validate:"required,email"`
+	MonthlyIncome int64  `json:"monthly_income" validate:"gte=0"`
+	AnnualRevenue int64  `json:"annual_revenue" validate:"gte=0"`
+	Balance       int64  `json:"balance" validate:"gte=0"`
 }
 
 func (createAccount *CreateAccountUseCase) Exec(request CreateAccountdUseCaseRequest) (uuid.UUID, error) {

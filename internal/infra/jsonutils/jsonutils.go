@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 func EncodeJson[T any](w http.ResponseWriter, r *http.Request, statusCode int, data T) error {
@@ -17,11 +19,28 @@ func EncodeJson[T any](w http.ResponseWriter, r *http.Request, statusCode int, d
 	return nil
 }
 
-func DecodeJson[T any](r *http.Request) (T, error) {
+func DecodeJson[T any](r *http.Request) (T, []map[string]string, error) {
 	var data T
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		return data, fmt.Errorf("decode json failed: %w", err)
+		return data, nil, fmt.Errorf("decode json failed: %w", err)
 	}
 
-	return data, nil
+	validate := validator.New()
+	err := validate.Struct(data)
+
+	if err != nil {
+		errors := err.(validator.ValidationErrors)
+		formattedErrors := make([]map[string]string, 0, len(errors))
+
+		for _, e := range errors {
+			formattedErrors = append(formattedErrors, map[string]string{
+				"field":   e.Field(),
+				"message": e.Tag(),
+			})
+		}
+
+		return data, formattedErrors, nil
+	}
+
+	return data, nil, nil
 }
