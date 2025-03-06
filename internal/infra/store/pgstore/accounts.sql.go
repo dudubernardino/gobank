@@ -12,6 +12,23 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const accountDeposit = `-- name: AccountDeposit :one
+UPDATE accounts SET balance = balance + $1 
+WHERE id = $2 RETURNING balance
+`
+
+type AccountDepositParams struct {
+	Balance int64     `json:"balance"`
+	ID      uuid.UUID `json:"id"`
+}
+
+func (q *Queries) AccountDeposit(ctx context.Context, arg AccountDepositParams) (int64, error) {
+	row := q.db.QueryRow(ctx, accountDeposit, arg.Balance, arg.ID)
+	var balance int64
+	err := row.Scan(&balance)
+	return balance, err
+}
+
 const createAccount = `-- name: CreateAccount :one
 INSERT INTO accounts (tax_id, name, monthly_income, annual_revenue, email, balance) 
 VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
@@ -38,6 +55,18 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (u
 	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getAccountBalanceById = `-- name: GetAccountBalanceById :one
+SELECT balance FROM accounts 
+WHERE id = $1
+`
+
+func (q *Queries) GetAccountBalanceById(ctx context.Context, id uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, getAccountBalanceById, id)
+	var balance int64
+	err := row.Scan(&balance)
+	return balance, err
 }
 
 const getAccountById = `-- name: GetAccountById :one

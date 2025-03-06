@@ -21,3 +21,17 @@ content-type: application/json
 GET {{baseUrl}}/accounts/{{accountId}} HTTP/1.1
 
 ###
+
+# @name  getAccountBalance
+GET {{baseUrl}}/accounts/{{accountId}}/balance HTTP/1.1
+
+###
+
+# @name  AccountDeposit
+POST {{baseUrl}}/accounts/{{accountId}}/deposit HTTP/1.1
+content-type: application/json
+
+{
+    "amount": 50
+}
+###

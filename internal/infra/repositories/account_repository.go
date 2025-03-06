@@ -61,3 +61,29 @@ func (repository *AccountRepositoryPostgres) Create(payload entities.Account) (u
 
 	return id, nil
 }
+
+func (repository *AccountRepositoryPostgres) FindAccountBalanceById(id uuid.UUID) (int64, error) {
+	ctx := context.Background()
+	balance, err := repository.queries.GetAccountBalanceById(ctx, id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return balance, nil
+}
+
+func (repository *AccountRepositoryPostgres) AccountDeposit(id uuid.UUID, amount int64) (int64, error) {
+	ctx := context.Background()
+
+	balance, err := repository.queries.AccountDeposit(ctx, pgstore.AccountDepositParams{
+		Balance: amount,
+		ID:      id,
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	return balance, nil
+}

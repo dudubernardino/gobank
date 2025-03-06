@@ -15,6 +15,8 @@ func (api *Api) BindRoutes(pool *pgxpool.Pool) {
 			router.Route("/accounts", func(router chi.Router) {
 				router.Post("/", accounts.HandleCreateAccount(pool))
 				router.Get("/{account_id}", accounts.HandleGetAccountById(pool))
+				router.Get("/{account_id}/balance", accounts.HandleGetAccountBalance(pool))
+				router.Post("/{account_id}/deposit", accounts.HandleAccountDeposit(pool))
 			})
 		})
 	})
