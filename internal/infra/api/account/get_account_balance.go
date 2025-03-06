@@ -1,6 +1,7 @@
 package account
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
@@ -19,14 +20,15 @@ func HandleGetAccountBalance(pool *pgxpool.Pool) http.HandlerFunc {
 		rawAccountId := chi.URLParam(r, "account_id")
 		accountId, err := uuid.Parse(rawAccountId)
 		if err != nil {
-			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": "invalid ID format"})
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": ErrInvalidIdFormat.Error()})
 			return
 		}
 
 		balance, err := getAccountBalanceUseCase.Exec(usecases.GetAccountBalanceUseCaseRequest{Id: accountId})
 
 		if err != nil {
-			_ = jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{"error": "account not found"})
+			slog.Error("error getting account balance", "error", err.Error())
+			_ = jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{"error": ErrAccountNotFound.Error()})
 			return
 		}
 

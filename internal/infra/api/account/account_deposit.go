@@ -1,6 +1,7 @@
 package account
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
@@ -19,7 +20,7 @@ func HandleAccountDeposit(pool *pgxpool.Pool) http.HandlerFunc {
 		rawAccountId := chi.URLParam(r, "account_id")
 		accountId, err := uuid.Parse(rawAccountId)
 		if err != nil {
-			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": "invalid ID format"})
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": ErrInvalidIdFormat.Error()})
 			return
 		}
 
@@ -39,8 +40,8 @@ func HandleAccountDeposit(pool *pgxpool.Pool) http.HandlerFunc {
 		balance, err := accountDepositUseCase.Exec(usecases.AccountDepositUseCaseRequest{Id: accountId, Amount: data.Amount})
 
 		if err != nil {
-			// TODO: improve this error handling
-			_ = jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{"error": "account not found"})
+			slog.Error("error depositing account balance", "error", err.Error())
+			_ = jsonutils.EncodeJson(w, r, http.StatusNotFound, map[string]any{"error": ErrAccountDeposit.Error()})
 			return
 		}
 

@@ -39,7 +39,7 @@ func HandleCreateAccount(pool *pgxpool.Pool) http.HandlerFunc {
 
 		if err != nil {
 			slog.Error("error creating account", "error", err.Error())
-			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": "something went wrong trying to create the account"})
+			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": ErrAccountCreate.Error()})
 			return
 		}
 
