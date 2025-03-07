@@ -13,3 +13,11 @@ WHERE id = $1;
 -- name: AccountDeposit :one
 UPDATE accounts SET balance = balance + $1 
 WHERE id = $2 RETURNING balance;
+
+-- name: AccountWithdraw :one
+UPDATE accounts SET balance = balance - $1 
+WHERE id = $2 RETURNING balance;
+
+-- name: Delete :one
+UPDATE accounts SET deleted_at = CURRENT_TIMESTAMP
+WHERE id = $1 RETURNING id;

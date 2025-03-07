@@ -41,6 +41,7 @@ func (repository *AccountRepositoryPostgres) FindById(id uuid.UUID) (entities.Ac
 		AnnualRevenue: account.AnnualRevenue.Int64,
 		CreatedAt:     account.CreatedAt.Time,
 		UpdatedAt:     account.UpdatedAt,
+		DeletedAt:     account.DeletedAt.Time,
 	}, nil
 }
 
@@ -86,4 +87,65 @@ func (repository *AccountRepositoryPostgres) AccountDeposit(id uuid.UUID, amount
 	}
 
 	return balance, nil
+}
+
+func (repository *AccountRepositoryPostgres) AccountWithdraw(id uuid.UUID, amount int64) (int64, error) {
+	ctx := context.Background()
+
+	balance, err := repository.queries.AccountWithdraw(ctx, pgstore.AccountWithdrawParams{
+		Balance: amount,
+		ID:      id,
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	return balance, nil
+}
+
+func (repository *AccountRepositoryPostgres) AccountTransfer(originId, destinationId uuid.UUID, amount int64) error {
+	ctx := context.Background()
+
+	tx, err := repository.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback(ctx)
+
+	_, err = repository.queries.AccountWithdraw(ctx, pgstore.AccountWithdrawParams{
+		ID:      originId,
+		Balance: amount,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = repository.queries.AccountDeposit(ctx, pgstore.AccountDepositParams{
+		ID:      destinationId,
+		Balance: amount,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repository *AccountRepositoryPostgres) Delete(id uuid.UUID) error {
+	ctx := context.Background()
+
+	_, err := repository.queries.Delete(ctx, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

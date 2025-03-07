@@ -18,7 +18,7 @@ func main() {
 		"--migrations",
 		"./internal/infra/store/pgstore/migrations",
 		"--config",
-		"./internal/store/pgstore/migrations/tern.conf",
+		"./internal/infra/store/pgstore/migrations/tern.conf",
 	)
 
 	output, err := cmd.CombinedOutput()

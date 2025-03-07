@@ -21,4 +21,5 @@ type Account struct {
 	Balance       int64              `json:"balance"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt     time.Time          `json:"updated_at"`
+	DeletedAt     pgtype.Timestamptz `json:"deleted_at"`
 }

@@ -29,6 +29,23 @@ func (q *Queries) AccountDeposit(ctx context.Context, arg AccountDepositParams) 
 	return balance, err
 }
 
+const accountWithdraw = `-- name: AccountWithdraw :one
+UPDATE accounts SET balance = balance - $1 
+WHERE id = $2 RETURNING balance
+`
+
+type AccountWithdrawParams struct {
+	Balance int64     `json:"balance"`
+	ID      uuid.UUID `json:"id"`
+}
+
+func (q *Queries) AccountWithdraw(ctx context.Context, arg AccountWithdrawParams) (int64, error) {
+	row := q.db.QueryRow(ctx, accountWithdraw, arg.Balance, arg.ID)
+	var balance int64
+	err := row.Scan(&balance)
+	return balance, err
+}
+
 const createAccount = `-- name: CreateAccount :one
 INSERT INTO accounts (tax_id, name, monthly_income, annual_revenue, email, balance) 
 VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
@@ -57,6 +74,17 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (u
 	return id, err
 }
 
+const delete = `-- name: Delete :one
+UPDATE accounts SET deleted_at = CURRENT_TIMESTAMP
+WHERE id = $1 RETURNING id
+`
+
+func (q *Queries) Delete(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, delete, id)
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getAccountBalanceById = `-- name: GetAccountBalanceById :one
 SELECT balance FROM accounts 
 WHERE id = $1
@@ -70,7 +98,7 @@ func (q *Queries) GetAccountBalanceById(ctx context.Context, id uuid.UUID) (int6
 }
 
 const getAccountById = `-- name: GetAccountById :one
-SELECT id, tax_id, name, monthly_income, annual_revenue, email, balance, created_at, updated_at FROM accounts 
+SELECT id, tax_id, name, monthly_income, annual_revenue, email, balance, created_at, updated_at, deleted_at FROM accounts 
 WHERE id = $1
 `
 
@@ -87,6 +115,7 @@ func (q *Queries) GetAccountById(ctx context.Context, id uuid.UUID) (Account, er
 		&i.Balance,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }

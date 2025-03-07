@@ -5,9 +5,9 @@ POST {{baseUrl}}/accounts HTTP/1.1
 content-type: application/json
 
 {
-    "tax_id": "74553007002",
+    "tax_id": "74553007005",
     "name": "John Doe",
-    "email": "email@email.com",
+    "email": "email+email2@email.com",
     "monthly_income": 1000000,
     "annual_revenue": 12000000,
     "balance": 1000000
@@ -34,4 +34,30 @@ content-type: application/json
 {
     "amount": 50
 }
+###
+
+# @name  AccountWithdraw
+POST {{baseUrl}}/accounts/{{accountId}}/withdraw HTTP/1.1
+content-type: application/json
+
+{
+    "amount": 50
+}
+###
+
+# @name  AccountAmountTransfer
+POST {{baseUrl}}/accounts/transfer HTTP/1.1
+content-type: application/json
+
+{
+    "account_origin_id": "1f9a9747-c452-46a6-96bc-6fcb8d75612e", 
+    "account_destination_id": "ac488a92-01fb-4027-8233-d26365999ae3",
+    "amount": 50
+}
+###
+
+# @name  CloseAccount
+DELETE {{baseUrl}}/accounts/{{accountId}} HTTP/1.1
+content-type: application/json
+
 ###
