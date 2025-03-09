@@ -5,9 +5,9 @@ POST {{baseUrl}}/accounts HTTP/1.1
 content-type: application/json
 
 {
-    "tax_id": "74553007005",
+    "tax_id": "74553007006",
     "name": "John Doe",
-    "email": "email+email2@email.com",
+    "email": "email@email.com",
     "monthly_income": 1000000,
     "annual_revenue": 12000000,
     "balance": 1000000

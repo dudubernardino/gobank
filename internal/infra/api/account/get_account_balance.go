@@ -4,17 +4,15 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/dudubernardino/gobank/internal/domain/account/repositories"
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
 	"github.com/dudubernardino/gobank/internal/infra/jsonutils"
-	"github.com/dudubernardino/gobank/internal/infra/repositories"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func HandleGetAccountBalance(pool *pgxpool.Pool) http.HandlerFunc {
+func HandleGetAccountBalance(accountRepository repositories.AccountRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		accountRepository := repositories.NewAccountsRepository(pool)
 		getAccountBalanceUseCase := usecases.NewGetAccountBalanceUseCase(accountRepository)
 
 		rawAccountId := chi.URLParam(r, "account_id")

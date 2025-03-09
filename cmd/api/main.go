@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -14,33 +15,58 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func init() {
 	gob.Register(uuid.UUID{})
-
 	if err := godotenv.Load(); err != nil {
-		panic(err)
+		slog.Info("Warning: .env file not found, using system environment variables")
 	}
+}
 
-	ctx := context.Background()
-	pool, err := pgxpool.New(ctx, fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", os.Getenv("GOBANK_DATABASE_USER"), os.Getenv("GOBANK_DATABASE_PASSWORD"), os.Getenv("GOBANK_DATABASE_HOST"), os.Getenv("GOBANK_DATABASE_PORT"), os.Getenv("GOBANK_DATABASE_NAME")))
+func setupDatabase(ctx context.Context) (*pgxpool.Pool, error) {
+	dsn := fmt.Sprintf(
+		"user=%s password=%s host=%s port=%s dbname=%s",
+		os.Getenv("GOBANK_DATABASE_USER"),
+		os.Getenv("GOBANK_DATABASE_PASSWORD"),
+		os.Getenv("GOBANK_DATABASE_HOST"),
+		os.Getenv("GOBANK_DATABASE_PORT"),
+		os.Getenv("GOBANK_DATABASE_NAME"),
+	)
 
+	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to initialize database pool: %w", err)
 	}
-	defer pool.Close()
 
 	if err := pool.Ping(ctx); err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
+	return pool, nil
+}
+
+func startServer(pool *pgxpool.Pool) error {
 	api := api.Api{
 		Router: chi.NewMux(),
 	}
 
 	api.BindRoutes(pool)
 
-	fmt.Println("Starting Server on port :3000")
-	if err := http.ListenAndServe(":3000", api.Router); err != nil {
-		panic(err)
+	serverAddr := ":3000"
+	slog.Info("Starting server on", "port", serverAddr)
+
+	return http.ListenAndServe(serverAddr, api.Router)
+}
+
+func main() {
+	ctx := context.Background()
+
+	pool, err := setupDatabase(ctx)
+	if err != nil {
+		slog.Error("Error initializing database", "error", err)
+	}
+	defer pool.Close()
+
+	if err := startServer(pool); err != nil {
+		slog.Error("Server error", "error", err)
 	}
 }

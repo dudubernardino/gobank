@@ -4,15 +4,13 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/dudubernardino/gobank/internal/domain/account/repositories"
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
 	"github.com/dudubernardino/gobank/internal/infra/jsonutils"
-	"github.com/dudubernardino/gobank/internal/infra/repositories"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func HandleAccountAmountTransfer(pool *pgxpool.Pool) http.HandlerFunc {
+func HandleAccountAmountTransfer(accountRepository repositories.AccountRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		accountRepository := repositories.NewAccountsRepository(pool)
 		accountAmountTransferUseCase := usecases.NewAccountAmountTransferUseCase(accountRepository)
 
 		data, problems, err := jsonutils.DecodeJson[usecases.AccountAmountTransferUseCaseRequest](r)

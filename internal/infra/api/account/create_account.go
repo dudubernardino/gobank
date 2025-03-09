@@ -4,15 +4,13 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/dudubernardino/gobank/internal/domain/account/repositories"
 	"github.com/dudubernardino/gobank/internal/domain/account/usecases"
 	"github.com/dudubernardino/gobank/internal/infra/jsonutils"
-	"github.com/dudubernardino/gobank/internal/infra/repositories"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func HandleCreateAccount(pool *pgxpool.Pool) http.HandlerFunc {
+func HandleCreateAccount(accountRepository repositories.AccountRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		accountRepository := repositories.NewAccountsRepository(pool)
 		createAccountUseCase := usecases.NewCreateAccountUseCase(accountRepository)
 
 		data, problems, err := jsonutils.DecodeJson[usecases.CreateAccountdUseCaseRequest](r)

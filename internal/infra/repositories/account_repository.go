@@ -16,7 +16,7 @@ type AccountRepositoryPostgres struct {
 	queries *pgstore.Queries
 }
 
-func NewAccountsRepository(pool *pgxpool.Pool) repositories.AccountRepository {
+func NewAccountsRepositoryPostgres(pool *pgxpool.Pool) repositories.AccountRepository {
 	return &AccountRepositoryPostgres{
 		pool:    pool,
 		queries: pgstore.New(pool),
@@ -114,7 +114,9 @@ func (repository *AccountRepositoryPostgres) AccountTransfer(originId, destinati
 
 	defer tx.Rollback(ctx)
 
-	_, err = repository.queries.AccountWithdraw(ctx, pgstore.AccountWithdrawParams{
+	queries := pgstore.New(tx)
+
+	_, err = queries.AccountWithdraw(ctx, pgstore.AccountWithdrawParams{
 		ID:      originId,
 		Balance: amount,
 	})
@@ -122,7 +124,7 @@ func (repository *AccountRepositoryPostgres) AccountTransfer(originId, destinati
 		return err
 	}
 
-	_, err = repository.queries.AccountDeposit(ctx, pgstore.AccountDepositParams{
+	_, err = queries.AccountDeposit(ctx, pgstore.AccountDepositParams{
 		ID:      destinationId,
 		Balance: amount,
 	})
