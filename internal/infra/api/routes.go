@@ -13,13 +13,13 @@ func (api *Api) bindAccountRoutes(router chi.Router, pool *pgxpool.Pool) {
 
 	router.Route("/accounts", func(router chi.Router) {
 		router.Post("/", accounts.HandleCreateAccount(accountsRepository))
+		router.Post("/transfer", accounts.HandleAccountAmountTransfer(accountsRepository))
 
 		router.Route("/{account_id}", func(router chi.Router) {
 			router.Get("/", accounts.HandleGetAccountById(accountsRepository))
 			router.Get("/balance", accounts.HandleGetAccountBalance(accountsRepository))
 			router.Post("/deposit", accounts.HandleAccountDeposit(accountsRepository))
 			router.Post("/withdraw", accounts.HandleAccountWithdraw(accountsRepository))
-			router.Post("/transfer", accounts.HandleAccountAmountTransfer(accountsRepository))
 			router.Delete("/", accounts.HandleCloseAccount(accountsRepository))
 		})
 	})

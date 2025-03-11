@@ -17,6 +17,7 @@ func HandleCloseAccount(accountRepository repositories.AccountRepository) http.H
 
 		rawAccountId := chi.URLParam(r, "account_id")
 		accountId, err := uuid.Parse(rawAccountId)
+
 		if err != nil {
 			_ = jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{"error": ErrInvalidIdFormat.Error()})
 			return
