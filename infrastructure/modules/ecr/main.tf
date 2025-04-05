@@ -3,6 +3,10 @@ module "ecr" {
 
   repository_name = var.ecr_name
 
+  repository_image_tag_mutability = "MUTABLE"
+
+  repository_image_scan_on_push = true
+
   repository_read_write_access_arns = []
   repository_lifecycle_policy = jsonencode({
     rules = [
