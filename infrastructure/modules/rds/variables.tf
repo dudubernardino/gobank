@@ -14,11 +14,6 @@ variable "vpc_id" {
   description = "VPC ID for the App Runner service"
 }
 
-variable "vpc_public_subnets" {
-  type        = list(string)
-  description = "List of public subnets for the VPC connector"
-}
-
 variable "vpc_private_subnets" {
   type        = list(string)
   description = "List of private subnets for the VPC connector"

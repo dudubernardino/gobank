@@ -64,7 +64,6 @@ module "rds" {
 
   vpc_id              = module.vpc.vpc_id
   vpc_private_subnets = module.vpc.vpc_private_subnets
-  vpc_public_subnets  = module.vpc.vpc_public_subnets
 
   app_runner_sg = module.app-runner.app_runner_sg_id
   rds_tags = {
