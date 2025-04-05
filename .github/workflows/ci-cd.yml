@@ -39,8 +39,8 @@ jobs:
       - name: Build and Push Docker Image
         id: build-image
         env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        TAG: ${{ steps.generate_tag.outputs.sha }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ steps.generate_tag.outputs.sha }}
         run: |
           docker build -t $REGISTRY/gobank:$TAG .
           docker tag -t $REGISTRY/gobank:$TAG $REGISTRY/gobank:latest
