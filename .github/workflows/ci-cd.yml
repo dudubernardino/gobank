@@ -44,10 +44,10 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           TAG: ${{ steps.generate_tag.outputs.sha }}
         run: |
-          docker build -t $REGISTRY/gobank:$TAG .
-          docker tag $REGISTRY/gobank:$TAG $REGISTRY/gobank:latest
-          docker push --all-tags $REGISTRY/gobank
-          echo "image=$REGISTRY/gobank:$TAG" >> $GITHUB_OUTPUT
+          docker build -t $REGISTRY/gobank-ecr:$TAG .
+          docker tag $REGISTRY/gobank-ecr:$TAG $REGISTRY/gobank-ecr:latest
+          docker push --all-tags $REGISTRY/gobank-ecr
+          echo "image=$REGISTRY/gobank-ecr:$TAG" >> $GITHUB_OUTPUT
 
   deploy:
     name: Deploy to AWS

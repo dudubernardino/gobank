@@ -23,7 +23,7 @@ variable "tfstate_bucket" {
 
 variable "ecr_name" {
   type        = string
-  default     = "emb-ecr"
+  default     = "gobank-ecr"
   description = "ECR name"
 }
 
@@ -44,7 +44,7 @@ variable "ecr_image" {
 
 variable "app_runner_name" {
   type        = string
-  default     = "emb-app-runner"
+  default     = "gobank-app-runner"
   description = "App Runner name"
 }
 

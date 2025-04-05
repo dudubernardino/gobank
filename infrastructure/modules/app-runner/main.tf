@@ -4,7 +4,7 @@
 #   source_configuration {
 #     image_repository {
 #       image_configuration {
-#         port = "8000"
+#         port = "3000"
 #       }
 #       image_identifier      = var.ecr_image
 #       image_repository_type = var.ecr_repository_type
