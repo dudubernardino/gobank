@@ -8,7 +8,7 @@ resource "aws_iam_role" "app_runner_role" {
       {
         Effect : "Allow",
         Principal : {
-          Service : "build.apprunner.amazonaws.com"
+          Service : "tasks.apprunner.amazonaws.com"
         },
         Action : "sts:AssumeRole"
       }
@@ -18,7 +18,36 @@ resource "aws_iam_role" "app_runner_role" {
   tags = var.app_runner_tags
 }
 
-resource "aws_iam_role_policy_attachment" "container_registry_read_only_access" {
-  role       = aws_iam_role.app_runner_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+resource "aws_iam_role_policy" "app_runner_role_policy" {
+  name = "${var.app_runner_name}-role-policy"
+  role = aws_iam_role.app_runner_role.id
+
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "ECRReadOnlyAccess"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:GetRepositoryPolicy",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages",
+          "ecr:BatchGetRepositoryScanningConfiguration",
+          "ecr:GetLifecyclePolicy"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+
+
+  depends_on = [
+    aws_iam_role.app_runner_role,
+  ]
 }
