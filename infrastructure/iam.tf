@@ -79,6 +79,12 @@ resource "aws_iam_role_policy" "tf_role_policy" {
         Action   = "apprunner:*"
         Effect   = "Allow"
         Resource = "*"
+      },
+      {
+        Sid      = "Statement5"
+        Action   = "vpc:*"
+        Effect   = "Allow"
+        Resource = "*"
       }
     ]
   })
