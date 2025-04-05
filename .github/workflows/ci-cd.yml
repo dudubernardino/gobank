@@ -69,6 +69,9 @@ jobs:
         with:
           terraform_version: ${{ vars.TF_VERSION }}
 
+      - name: Set infrastructure project directory
+        run: cd infrastructure
+
       - name: Run Terraform init
         run: |
           terraform init
@@ -82,6 +85,9 @@ jobs:
 
       - name: Run Terraform apply
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_region: ${{ secrets.AWS_REGION }}
+          TF_VAR_ecr_image: ${{ needs.build.outputs.image }}
 
   release:
     name: Generate Release
