@@ -15,6 +15,8 @@ jobs:
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
 
     steps:
       - uses: actions/checkout@v4
@@ -41,8 +43,6 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           TAG: ${{ steps.generate_tag.outputs.sha }}
-        outputs:
-          image: ${{ steps.build-image.outputs.image }}
         run: |
           docker build -t $REGISTRY/gobank:$TAG .
           docker tag -t $REGISTRY/gobank:$TAG $REGISTRY/gobank:latest
