@@ -41,6 +41,8 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           TAG: ${{ steps.generate_tag.outputs.sha }}
+        outputs:
+          image: ${{ steps.build-image.outputs.image }}
         run: |
           docker build -t $REGISTRY/gobank:$TAG .
           docker tag -t $REGISTRY/gobank:$TAG $REGISTRY/gobank:latest
@@ -51,6 +53,7 @@ jobs:
   deploy:
     name: Deploy to AWS
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout code
@@ -76,7 +79,7 @@ jobs:
         run: terraform plan
         env:
           TF_VAR_region: ${{ secrets.AWS_REGION }}
-          TF_VAR_ecr_image: ${{ outputs.build-image.image }}
+          TF_VAR_ecr_image: ${{ needs.build.outputs.image }}
 
       - name: Run Terraform apply
         run: terraform apply -auto-approve
