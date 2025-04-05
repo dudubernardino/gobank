@@ -26,3 +26,9 @@ go.work.sum
 
 /bin
 /tmp
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+**/.terraform/*
+*.tfvars
