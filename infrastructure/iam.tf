@@ -82,7 +82,19 @@ resource "aws_iam_role_policy" "tf_role_policy" {
       },
       {
         Sid      = "Statement5"
-        Action   = "vpc:*"
+        Action   = "ec2:*"
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Sid      = "Statement6"
+        Action   = "secretsmanager:*"
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Sid      = "Statement7"
+        Action   = "rds:*"
         Effect   = "Allow"
         Resource = "*"
       }
